@@ -8,12 +8,26 @@ from realtime_leaders_board.leaderboard_controller import leaderboard as ld
 
 
 class Player(Document):
+    # begin: auto-generated types
+    # This code is auto-generated. Do not modify anything in this block.
+
+    from typing import TYPE_CHECKING
+
+    if TYPE_CHECKING:
+        from frappe.types import DF
+
+        last_updated: DF.Datetime | None
+        player: DF.Link | None
+        score: DF.Int
+    # end: auto-generated types
 
     def save(self, *args, **kwargs):
         self._save(*args, **kwargs)
 
-        ld.LeaderboardController.update_leaderboard
+        ld.LeaderboardController.notify_leaderboard()
 
-        print("triggered on save")
+		# Not appearing on bench log, maybe needs setup so not using frappe.log right now, will sort this out later
+        # frappe.log("Player notify_leaderboard triggered on save")
+        print("DEBUG: Player notify_leaderboard triggered on save")
 
 

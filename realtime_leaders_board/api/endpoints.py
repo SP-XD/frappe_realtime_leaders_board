@@ -1,14 +1,20 @@
 import frappe
 
-@frappe.whitelist(methods=["GET"]) # type: ignore
+
+@frappe.whitelist(methods=["GET"])
 def get_leaderboard():
     # Fetch all players and their scores, sorted by score descending
-    players = frappe.get_all(   # type: ignore
-        "Player",
-        fields=["name", "score"],
-        order_by="score desc"
-    )
+    # Using SQL to join Player with User
+    players = frappe.db.sql("""
+        SELECT p.player AS user_id,
+               u.username,
+               u.full_name,
+               p.score
+        FROM `tabPlayer` p
+        LEFT JOIN `tabUser` u ON u.email = p.player
+        ORDER BY p.score DESC
+    """, as_dict=True)
 
-    print(hasattr(frappe, "publish_realtime"))
-    print(hasattr(frappe.realtime, "publish_realtime")) # type: ignore
+    print("DEBUG: get_leaderboard", players)
+
     return players

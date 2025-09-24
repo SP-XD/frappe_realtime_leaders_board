@@ -5,14 +5,13 @@ frappe.pages["realtime-leaders"].on_page_load = function (wrapper) {
 		single_column: true,
 	});
 
-	// Directly insert HTML instead of render_template
 	page.body.html(`
         <div class="leaderboard-container">
             <table class="table table-striped">
                 <thead>
                     <tr>
                         <th>Rank</th>
-                        <th>Name</th>
+                        <th>Player Username</th>
                         <th>Score</th>
                     </tr>
                 </thead>
@@ -22,7 +21,7 @@ frappe.pages["realtime-leaders"].on_page_load = function (wrapper) {
     `);
 
 	// Realtime listener
-	frappe.realtime.on("update_leaderboard", function (data) {
+	frappe.realtime.on("notify_leaderboard", function (data) {
 		render_leaderboard(data);
 	});
 
@@ -41,14 +40,14 @@ frappe.pages["realtime-leaders"].on_page_load = function (wrapper) {
 		let tbody = $("#leaderboard-body");
 		tbody.empty();
 
-		// Sort by score desc
-		data.sort((a, b) => b.score - a.score);
+		// Not required, as data received is sorted
+		// data.sort((a, b) => b.score - a.score);
 
 		data.forEach((row, index) => {
 			tbody.append(`
                 <tr>
                     <td>${index + 1}</td>
-                    <td>${row.name}</td>
+                    <td>${row.username}</td>
                     <td>${row.score}</td>
                 </tr>
             `);

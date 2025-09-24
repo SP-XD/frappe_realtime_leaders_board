@@ -8,8 +8,6 @@
   "player",
   "column_break_nffp",
   "score",
-  "column_break_tece",
-  "rank",
   "column_break_viog",
   "last_updated"
  ],
@@ -19,7 +17,8 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Player",
-   "options": "User"
+   "options": "User",
+   "unique": 1
   },
   {
    "fieldname": "column_break_nffp",
@@ -30,17 +29,6 @@
    "fieldtype": "Int",
    "in_list_view": 1,
    "label": "Score"
-  },
-  {
-   "fieldname": "column_break_tece",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "rank",
-   "fieldtype": "Int",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Rank"
   },
   {
    "fieldname": "column_break_viog",
@@ -55,7 +43,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-22 01:30:53.350037",
+ "modified": "2025-09-25 02:55:22.975339",
  "modified_by": "Administrator",
  "module": "Realtime Leaders Board",
  "name": "Player",

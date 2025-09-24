@@ -1,13 +1,20 @@
-
 import frappe
+
 
 class LeaderboardController:
 
-    def update_leaderboard(self):
-        #! fix don't use player.name use player.user.username
-        entries = frappe.get_all("Player",
-            fields=["name", "score"],
-            order_by="score desc"
-        )
+    @staticmethod
+    def notify_leaderboard():
+        entries = frappe.db.sql("""
+            SELECT p.player AS user_id,
+                u.username,
+                u.full_name,
+                p.score
+            FROM `tabPlayer` p
+            LEFT JOIN `tabUser` u ON u.email = p.player
+        	ORDER BY p.score DESC
+        """, as_dict=True)
 
-        frappe.publish_realtime("update_leaderboard", entries)
+
+        print("DEBUG: published frappe.realtime")
+        frappe.publish_realtime("notify_leaderboard", entries)
