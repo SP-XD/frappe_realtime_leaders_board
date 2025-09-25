@@ -1,56 +1,133 @@
 frappe.pages["realtime-leaders"].on_page_load = function (wrapper) {
 	let page = frappe.ui.make_app_page({
 		parent: wrapper,
-		title: "Real-time Leaderboard",
+		title: "Mini Game + Real-time Leaderboard",
 		single_column: true,
 	});
 
-	page.body.html(`
-        <div class="leaderboard-container">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Player Username</th>
-                        <th>Score</th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboard-body"></tbody>
-            </table>
-        </div>
-    `);
+	// ========== Leaderboard UI =============
+	$(frappe.render_template("realtime_leaders", {})).appendTo(page.body);
 
-	// Realtime listener
-	frappe.realtime.on("notify_leaderboard", function (data) {
-		render_leaderboard(data);
+	// ========== Mini-game Logic ==========
+	const gameContainer = page.body.find("#game-container")[0];
+	const targetBox = page.body.find("#target-box")[0];
+	const scoreDisplay = page.body.find("#game-score")[0];
+	const resetButton = page.body.find("#reset-game")[0];
+	const submitButton = page.body.find("#submit-game")[0];
+
+	let gameScore = 0;
+
+	function moveBoxRandomly() {
+		const containerRect = gameContainer.getBoundingClientRect();
+		const boxRect = targetBox.getBoundingClientRect();
+
+		const maxLeft = containerRect.width - boxRect.width;
+		const maxTop = containerRect.height - boxRect.height;
+
+		const randomLeft = Math.random() * maxLeft;
+		const randomTop = Math.random() * maxTop;
+
+		targetBox.style.left = randomLeft + "px";
+		targetBox.style.top = randomTop + "px";
+	}
+
+	targetBox.addEventListener("click", () => {
+		gameScore += 1;
+		scoreDisplay.innerText = gameScore;
+		moveBoxRandomly();
 	});
 
-	// First fetch
+	resetButton.addEventListener("click", () => {
+		gameScore = 0;
+		scoreDisplay.innerText = "0";
+		moveBoxRandomly();
+	});
+
+	submitButton.addEventListener("click", () => {
+		submitScore(gameScore);
+	});
+
+	// initialize box
+	moveBoxRandomly();
+
+	function submitScore(score) {
+		frappe.call({
+			method: "realtime_leaders_board.api.endpoints.submit_game_score",
+			type: "POST",
+			args: { score: gameScore },
+			callback: (r) => {
+				// maybe fetch the updated leaderboard again
+			},
+		});
+	}
+
+	// ========== Leaderboard Logic ==========
+	// Load canvas-confetti from CDN
+	function loadConfettiScript(cb) {
+		if (window.confetti) return cb();
+		const script = document.createElement("script");
+		script.src =
+			"https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js";
+		script.onload = cb;
+		document.head.appendChild(script);
+	}
+
+	// Use this until i find frappe session proper username
+	let lastRank1 = null;
+
+	function showConfetti() {
+		loadConfettiScript(() => {
+			const canvas = document.getElementById("confetti-canvas");
+			// canvas.width = canvas.parentElement.offsetWidth;
+			// canvas.height = 120;
+			window.confetti.create(canvas, { resize: true })({
+				particleCount: 80,
+				spread: 70,
+				origin: { y: 0.3 },
+			});
+			// setTimeout(() => {
+			// 	canvas.width = 0;
+			// 	canvas.height = 0;
+			// }, 1200);
+		});
+	}
+
+	function renderLeaderboard(data) {
+		let tbody = page.body.find("#leaderboard-body");
+		tbody.empty();
+
+		console.log(frappe.session);
+
+		// Confetti for rank 1 change
+		if (data.length && data[0].username !== lastRank1) {
+			showConfetti();
+			lastRank1 = data[0].username;
+		}
+
+		// no need sort as data is already sorted from db fetch
+		// data.sort((a, b) => b.score - a.score);
+		data.forEach((row, idx) => {
+			tbody.append(`<tr>
+                <td>${idx + 1}</td>
+                <td>${row.username}</td>
+                <td>${row.score}</td>
+            </tr>`);
+		});
+	}
+
+	// initial fetch
 	frappe.call({
 		method: "realtime_leaders_board.api.endpoints.get_leaderboard",
 		type: "GET",
-		callback: function (r) {
+		callback: (r) => {
 			if (r.message) {
-				render_leaderboard(r.message);
+				renderLeaderboard(r.message);
 			}
 		},
 	});
 
-	function render_leaderboard(data) {
-		let tbody = $("#leaderboard-body");
-		tbody.empty();
-
-		// Not required, as data received is sorted
-		// data.sort((a, b) => b.score - a.score);
-
-		data.forEach((row, index) => {
-			tbody.append(`
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${row.username}</td>
-                    <td>${row.score}</td>
-                </tr>
-            `);
-		});
-	}
+	// realtime updates
+	frappe.realtime.on("notify_leaderboard", (data) => {
+		renderLeaderboard(data);
+	});
 };

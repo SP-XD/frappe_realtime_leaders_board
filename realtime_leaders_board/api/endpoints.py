@@ -18,3 +18,17 @@ def get_leaderboard():
     print("DEBUG: get_leaderboard", players)
 
     return players
+
+@frappe.whitelist(methods=["POST"])
+def submit_game_score(score):
+    try:
+        user = frappe.user
+        p = frappe.get_doc("Player", user)
+        print("DEBUG player:",p)
+        p.set("score", score)
+        p.save(ignore_permissions=True)
+
+        return {"success": True}
+    except Exception as e:
+        print("FATAL: ", e)
+        return {"success": False}
