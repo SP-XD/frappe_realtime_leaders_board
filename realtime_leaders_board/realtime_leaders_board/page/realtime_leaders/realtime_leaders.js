@@ -73,9 +73,6 @@ frappe.pages["realtime-leaders"].on_page_load = function (wrapper) {
 		document.head.appendChild(script);
 	}
 
-	// Use this until i find frappe session proper username
-	let lastRank1 = null;
-
 	function showConfetti() {
 		loadConfettiScript(() => {
 			const canvas = document.getElementById("confetti-canvas");
