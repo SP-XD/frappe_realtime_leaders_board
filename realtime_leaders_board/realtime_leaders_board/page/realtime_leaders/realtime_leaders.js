@@ -54,9 +54,10 @@ frappe.pages["realtime-leaders"].on_page_load = function (wrapper) {
 		frappe.call({
 			method: "realtime_leaders_board.api.endpoints.submit_game_score",
 			type: "POST",
-			args: { score: gameScore },
+			args: { player_email: frappe.session.user_email, score: gameScore },
 			callback: (r) => {
 				// maybe fetch the updated leaderboard again
+				console.log("Response of submit score: " + r);
 			},
 		});
 	}
@@ -97,9 +98,10 @@ frappe.pages["realtime-leaders"].on_page_load = function (wrapper) {
 		tbody.empty();
 
 		console.log(frappe.session);
+		console.log(data[0].email);
 
 		// Confetti for rank 1 change
-		if (data.length && data[0].username !== lastRank1) {
+		if (data.length && data[0].email == frappe.session.user_email) {
 			showConfetti();
 			lastRank1 = data[0].username;
 		}

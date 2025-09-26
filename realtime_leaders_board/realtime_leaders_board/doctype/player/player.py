@@ -17,8 +17,8 @@ class Player(Document):
         from frappe.types import DF
 
         last_updated: DF.Datetime | None
-        player: DF.Link | None
         score: DF.Int
+        user: DF.Link | None
     # end: auto-generated types
 
     def save(self, *args, **kwargs):

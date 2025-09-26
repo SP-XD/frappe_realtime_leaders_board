@@ -5,21 +5,13 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "player",
+  "user",
   "column_break_nffp",
   "score",
   "column_break_viog",
   "last_updated"
  ],
  "fields": [
-  {
-   "fieldname": "player",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Player",
-   "options": "User",
-   "unique": 1
-  },
   {
    "fieldname": "column_break_nffp",
    "fieldtype": "Column Break"
@@ -38,13 +30,21 @@
    "fieldname": "last_updated",
    "fieldtype": "Datetime",
    "label": "last_updated"
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "User",
+   "options": "User",
+   "unique": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-09-25 02:55:22.975339",
- "modified_by": "Administrator",
+ "modified": "2025-09-27 02:29:21.330417",
+ "modified_by": "somnathpauldev@gmail.com",
  "module": "Realtime Leaders Board",
  "name": "Player",
  "owner": "Administrator",
