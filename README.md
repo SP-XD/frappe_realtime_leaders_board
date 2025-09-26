@@ -2,6 +2,10 @@
 
 Realtime leaders board for game rankings 
 
+
+https://github.com/user-attachments/assets/5827d1ae-0938-407b-b55a-8a4b52786807
+
+
 ### Installation
 
 You can install this app using the [bench](https://github.com/frappe/bench) CLI:
